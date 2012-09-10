@@ -21,8 +21,8 @@ except ImportError:
 
 import pythonect
 
-
 # Pythonect Console
+
 
 class PythonectCompile(codeop.Compile):
 
@@ -159,11 +159,11 @@ def main():
 
         if args.server:
 
-            server = _DistServer(args.server)
+            server = pythonect._DistServer(args.server)
 
         else:
 
-            server = _DistServer()
+            server = pythonect._DistServer()
 
     else:
 

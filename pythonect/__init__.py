@@ -21,11 +21,16 @@ except ImportError as e:
     del e, get_version, internal
 
 
-# API
+# Internals
+
+    from internal.server import _DistServer
 
 try:
 
+# API
+
     from internal.eval import eval, parse
+
 
 except ImportError as e:
 
