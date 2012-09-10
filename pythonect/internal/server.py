@@ -14,8 +14,7 @@ def start_xml_server(port):
     
     ######################################
     # How do I get to __builtin__?
-    print dir()
-    print dir(__builtin__)
+    print dir(__builtins__)
     #################################
     
     
@@ -23,8 +22,9 @@ def start_xml_server(port):
     for builtin_name in dir(__builtin__):
         try:
             func = eval(builtin_name)
-            server.register_function(func, builtin_name)
-            print 'registered %s successfully' % builtin_name
+            if type(func) == type(pow):
+                server.register_function(func, builtin_name)
+                print 'registered %s successfully' % builtin_name
         except Exception, e:
             print '*****Failed to eval %s' % builtin_name
         
