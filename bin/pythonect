@@ -135,6 +135,8 @@ def main():
     parser.add_argument('arg', metavar='arg', nargs='*', help='arguments passed to program in sys.argv[1:]')
     parser.add_argument('--verbose', '-v', action='count', default=0)
     parser.add_argument('--version', '-V', action='version', version=banner)
+    parser.add_argument('--distributed', action='store_true', help = 'Run in distributed mode')
+    parser.add_argument('--server', '-S', nargs=1, default = None, help = 'Use specified server for distributed mode')
 
     args = parser.parse_args()
 
