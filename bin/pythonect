@@ -159,11 +159,11 @@ def main():
 
         if args.server:
 
-            server = pythonect._DistServer(args.server)
+            server = pythonect._XMLRPCManager(args.server)
 
         else:
 
-            server = pythonect._DistServer()
+            server = pythonect._XMLRPCManager()
 
     else:
 
