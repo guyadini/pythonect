@@ -10,10 +10,17 @@ def start_xml_server(port):
     server = SimpleXMLRPCServer(("localhost", port) )
     server.register_introspection_functions()
     
-    # Register all builtins in the xml server:
+    # Register all builtin functions in the xml server:
     
-    print dir(__builtins__)
-    for builtin_name in dir(__builtins__):
+    ######################################
+    # How do I get to __builtin__?
+    print dir()
+    print dir(__builtin__)
+    #################################
+    
+    
+    exit(1)
+    for builtin_name in dir(__builtin__):
         try:
             func = eval(builtin_name)
             server.register_function(func, builtin_name)
@@ -52,15 +59,13 @@ class _DistServer(object):
             print 'Testing server: max(3,4) = %d' % self.client.max(3,4)
 
         
-
-    # TODO - implement, wrap all python builtins. Cool!
-
     def __start_server_process(self, port):
         '''
         Start xml-rpc server in a new process.
         '''
         proc = multiprocessing.Process(target=start_xml_server, args=(port,))
         proc.start()
+        
         
 
         
