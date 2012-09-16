@@ -1,16 +1,74 @@
-from SimpleXMLRPCServer import SimpleXMLRPCServer
+from SimpleXMLRPCServer import SimpleXMLRPCServer, SimpleXMLRPCRequestHandler
+import SocketServer
 import xmlrpclib
 import multiprocessing
 import types
 import __builtin__
 
 
+ENABLE_SERVER_LOGGING = True
+
+
 POLL_INTERVAL = 0.1
+
+# TODO: add the option of having the server log all requests, for debugging.
+
+
+
+# Taken from http://code.activestate.com/recipes/425043-simple-threaded-xml-rpc-server/  
+class AsyncXMLRPCServer(SocketServer.ThreadingMixIn,SimpleXMLRPCServer): 
+    pass
+
+
+# Taken from http://code.activestate.com/recipes/496700-logging-simplexmlrpcserver/
+# But without using the logging class (so that the main log isn't touched).
+log_file = open('xmlrpc.log','w')
+class LoggingSimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler): 
+    """Overides the default SimpleXMLRPCRequestHander to support logging.  Logs
+    client IP and the XML request and response.
+    """
+
+    def do_POST(self):
+        clientIP, port = self.client_address
+    # Log client IP and Port
+        log_file.write('Client IP: %s - Port: %s' % (clientIP, port))
+        try:
+            # get arguments
+            data = self.rfile.read(int(self.headers["content-length"]))
+            # Log client request
+            log_file.write('Client request: \n%s\n' % data)
+            response = self.server._marshaled_dispatch(data, getattr(self, '_dispatch', None))
+            
+            # Log server response
+            log_file.write('Server response: \n%s\n' % response)
+            log_file.flush()
+            
+        except: # This should only happen if the module is buggy
+            # internal error, report as HTTP server error
+            self.send_response(500)
+            self.end_headers()
+        else:
+            # got a valid XML RPC response
+            self.send_response(200)
+            self.send_header("Content-type", "text/xml")
+            self.send_header("Content-length", str(len(response)))
+            self.end_headers()
+            self.wfile.write(response)
+
+            # shut down the connection
+            self.wfile.flush()
+            self.connection.shutdown(1)
+
 
 
 def start_xml_server(port):
     # Create server
-    server = SimpleXMLRPCServer(("localhost", port))
+    if ENABLE_SERVER_LOGGING is True:
+        server = AsyncXMLRPCServer(("localhost", port), requestHandler = LoggingSimpleXMLRPCRequestHandler)
+    else:
+        server = AsyncXMLRPCServer(("localhost", port))
+        
+    
     server.register_introspection_functions()
     server.logRequests = 0
 
@@ -37,8 +95,6 @@ class _XMLRPCManager(object):
     '''
 
     def __init__(self, server_name=None, port=8092):
-
-        #Doesn't work, even here. Where does __builtins__ get corrupted?
 
         if server_name:
             try:

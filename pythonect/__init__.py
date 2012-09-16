@@ -23,7 +23,7 @@ except ImportError as e:
 
 # Internals
 
-    from internal.server import _DistServer
+    from internal.server import _XMLRPCManager
 
 try:
 
