@@ -14,16 +14,17 @@ POLL_INTERVAL = 0.1
 # TODO: add the option of having the server log all requests, for debugging.
 
 
-
-# Taken from http://code.activestate.com/recipes/425043-simple-threaded-xml-rpc-server/  
-class AsyncXMLRPCServer(SocketServer.ThreadingMixIn,SimpleXMLRPCServer): 
+# Taken from http://code.activestate.com/recipes/425043-simple-threaded-xml-rpc-server/
+class AsyncXMLRPCServer(SocketServer.ThreadingMixIn, SimpleXMLRPCServer):
     pass
 
 
 # Taken from http://code.activestate.com/recipes/496700-logging-simplexmlrpcserver/
 # But without using the logging class (so that the main log isn't touched).
-log_file = open('xmlrpc.log','w')
-class LoggingSimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler): 
+log_file = open('xmlrpc.log', 'w')
+
+
+class LoggingSimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
     """Overides the default SimpleXMLRPCRequestHander to support logging.  Logs
     client IP and the XML request and response.
     """
@@ -38,12 +39,12 @@ class LoggingSimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
             # Log client request
             log_file.write('Client request: \n%s\n' % data)
             response = self.server._marshaled_dispatch(data, getattr(self, '_dispatch', None))
-            
+
             # Log server response
             log_file.write('Server response: \n%s\n' % response)
             log_file.flush()
-            
-        except: # This should only happen if the module is buggy
+
+        except:  # This should only happen if the module is buggy
             # internal error, report as HTTP server error
             self.send_response(500)
             self.end_headers()
@@ -60,15 +61,13 @@ class LoggingSimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
             self.connection.shutdown(1)
 
 
-
 def start_xml_server(port):
     # Create server
     if ENABLE_SERVER_LOGGING is True:
-        server = AsyncXMLRPCServer(("localhost", port), requestHandler = LoggingSimpleXMLRPCRequestHandler)
+        server = AsyncXMLRPCServer(("localhost", port), requestHandler=LoggingSimpleXMLRPCRequestHandler)
     else:
         server = AsyncXMLRPCServer(("localhost", port))
-        
-    
+
     server.register_introspection_functions()
     server.logRequests = 0
 
