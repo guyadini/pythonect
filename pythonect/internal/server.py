@@ -62,6 +62,9 @@ class LoggingSimpleXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
 
 
 def start_xml_server(port):
+    '''
+    Start an XML-RPC server at the given port.
+    '''
     # Create server
     if ENABLE_SERVER_LOGGING is True:
         server = AsyncXMLRPCServer(("localhost", port), requestHandler=LoggingSimpleXMLRPCRequestHandler)
@@ -80,6 +83,7 @@ def start_xml_server(port):
             func = eval(builtin_name)
             if isinstance(func, types.BuiltinFunctionType):
                 server.register_function(func, builtin_name)
+
         except Exception, e:
             print '*****Failed to eval %s, error = %s' % (builtin_name, e)
 
@@ -108,8 +112,8 @@ class _XMLRPCManager(object):
             print '==== Starting Pythonect development server ===='
             self.server = self.__start_server_process(port)
             self.client = xmlrpclib.ServerProxy('http://localhost:%d' % port)
-            print 'Testing server: max(3,4) = %d' % self.client.max(3, 4)
-            print 'Testing server: pow(2,8) = %d' % self.client.pow(2, 8)
+            #print 'Testing server: max(3,4) = %d' % self.client.max(3, 4)
+            #print 'Testing server: pow(2,8) = %d' % self.client.pow(2, 8)
 
     def __start_server_process(self, port):
         '''
