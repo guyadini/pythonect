@@ -25,20 +25,6 @@ import pythonect
 # Pythonect Console
 
 
-def calc_builtins_dict(xmlrpc_manager):
-    '''
-    @return: Dictionary mapping all non-print builtin functions to remote calls through
-        the xmlrpc_manager.
-    @param xmlrpc_client: the manager which the builtin functions are redirected to.
-    '''
-    builtins_dict = {}
-    for builtin_name in dir(__builtin__):
-        if builtin_name != 'print':
-            builtins_dict[builtin_name] = eval('xmlrpc_manager.client.' + builtin_name)
-
-    return builtins_dict
-
-
 class PythonectCompile(codeop.Compile):
 
     def __init__(self):
@@ -184,20 +170,12 @@ def main():
 
         rpc_manager = None
 
+    globals_dict = rpc_manager.globals_dict if rpc_manager else {}
+    
     # Script-mode (i.e. ./pythonect script or #!/usr/bin/env pythonect)
 
     if args.script:
-
-        globals_dict = {}
-
-        if rpc_manager is None:
-
-            globals_dict.update({'rpc_manager': rpc_manager})
-
-            globals_dict.update(calc_builtins_dict(rpc_manager))
-
-        print globals_dict
-
+        
         pythonect.eval(args.script.read().replace('\\\n', ''), globals_dict, {})
 
         args.script.close()
@@ -209,6 +187,8 @@ def main():
         # Add current working directory to sys.path
 
         sys.path.insert(0, os.getcwd())
+
+        #TODO - pass the globals dict to the interactive console
 
         PythonectInteractiveConsole().interact(banner)
 

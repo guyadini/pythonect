@@ -114,7 +114,16 @@ class _XMLRPCManager(object):
             self.client = xmlrpclib.ServerProxy('http://localhost:%d' % port)
             #print 'Testing server: max(3,4) = %d' % self.client.max(3, 4)
             #print 'Testing server: pow(2,8) = %d' % self.client.pow(2, 8)
+        
+        # Wrap builtins and save as a dictionary which eval can use
 
+        self.globals_dict = {}
+        for builtin_name in dir(__builtin__):
+            if builtin_name != 'print':
+                self.globals_dict[builtin_name] = self.client.builtin_name
+        
+    
+    
     def __start_server_process(self, port):
         '''
         Start xml-rpc server in a new process.
