@@ -112,16 +112,23 @@ class _XMLRPCManager(object):
             print '==== Starting Pythonect development server ===='
             self.server = self.__start_server_process(port)
             self.client = xmlrpclib.ServerProxy('http://localhost:%d' % port)
-            #print 'Testing server: max(3,4) = %d' % self.client.max(3, 4)
-            #print 'Testing server: pow(2,8) = %d' % self.client.pow(2, 8)
+            print 'Testing server: max(3,4) = %d' % self.client.max(3, 4)
+            print 'Testing server: pow(2,8) = %d' % self.client.pow(2, 8)
         
         # Wrap builtins and save as a dictionary which eval can use
 
         self.globals_dict = {}
         for builtin_name in dir(__builtin__):
-            if builtin_name != 'print':
-                self.globals_dict[builtin_name] = self.client.builtin_name
-        
+            #TODO: testing only - Y U NO WORK??
+            if builtin_name != 'print' and builtin_name == 'len':
+                func = eval(builtin_name)
+                if isinstance(func, types.BuiltinFunctionType):
+                    self.globals_dict[builtin_name] = eval('self.client.' + builtin_name)
+        print '**********************'
+        print 'globals_dict: ',
+        for k in self.globals_dict.keys(): print k,          
+        print 'LEN: ' + str(self.globals_dict['len']('hello world'))
+        print '**********************'
     
     
     def __start_server_process(self, port):

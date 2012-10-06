@@ -170,6 +170,7 @@ def main():
 
         rpc_manager = None
 
+    
     globals_dict = rpc_manager.globals_dict if rpc_manager else {}
     
     # Script-mode (i.e. ./pythonect script or #!/usr/bin/env pythonect)
@@ -177,6 +178,7 @@ def main():
     if args.script:
         
         pythonect.eval(args.script.read().replace('\\\n', ''), globals_dict, {})
+        #pythonect.eval(args.script.read().replace('\\\n', ''), {}, {})
 
         args.script.close()
 
